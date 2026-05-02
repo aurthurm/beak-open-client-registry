@@ -1,10 +1,12 @@
 const fs = require('fs');
-const async = require('async');
+const requireFallback = require('./requireFallback');
+const async = requireFallback('async');
 const csv = require('fast-csv');
 const path = require('path');
-const request = require('request');
+const request = requireFallback('request');
 const moment = require('moment');
 const uploadResults = require('./uploadResults');
+process.env.NODE_ENV = process.env.NODE_ENV || 'test';
 const logger = require('../server/lib/winston');
 
 if (!process.argv[2]) {

@@ -1,10 +1,12 @@
 'use strict';
 const fs = require('fs');
-const csv = require('fast-csv');
+const requireFallback = require('./requireFallback');
+const csv = requireFallback('fast-csv');
 const path = require('path');
-const async = require('async');
-const jsoncsv = require('json-csv');
-const moment = require('moment')
+const async = requireFallback('async');
+const jsoncsv = requireFallback('json-csv');
+const moment = requireFallback('moment')
+process.env.NODE_ENV = process.env.NODE_ENV || 'test';
 const logger = require('../server/lib/winston');
 const fhirWrapper = require('../server/lib/fhir')();
 const config = require('../server/lib/config');

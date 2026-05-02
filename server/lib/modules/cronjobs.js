@@ -5,9 +5,13 @@ const logger = require('../winston');
 
 let patientReprocessing = config.get("cronJobs:patientReprocessing");
 
-cron.schedule(patientReprocessing, () => {
-  logger.info('Running cron job for patients reprocessing');
-  matchMixin.reprocessPatients().then(() => {
-    logger.info('Done running cron job for patients reprocessing');
+if (typeof patientReprocessing === 'string' && patientReprocessing.trim()) {
+  cron.schedule(patientReprocessing, () => {
+    logger.info('Running cron job for patients reprocessing');
+    matchMixin.reprocessPatients().then(() => {
+      logger.info('Done running cron job for patients reprocessing');
+    });
   });
-});
+} else {
+  logger.warn('Skipping patient reprocessing cron job because no valid schedule was configured');
+}

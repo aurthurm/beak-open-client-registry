@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 set -ex
 
-# automate tagging with the short commit hash
-docker build --no-cache -t intrahealth/opencr:$(git rev-parse --short HEAD) .
-docker tag intrahealth/opencr:$(git rev-parse --short HEAD) intrahealth/opencr
-docker push intrahealth/opencr:$(git rev-parse --short HEAD)
-docker push intrahealth/opencr:latest
+scriptDir=$( cd "$(dirname "${BASH_SOURCE[0]}")" ; pwd -P )
+repoRoot=$( cd "$scriptDir/../.." ; pwd -P )
+
+# build the local OpenCR image from this checkout
+docker build --no-cache -f "$repoRoot/docker/opencr/Dockerfile" -t client-registry-opencr:latest "$repoRoot"

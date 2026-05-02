@@ -225,7 +225,7 @@ function start(callback) {
             }
           });
           const app = appRoutes();
-          const server = app.listen(config.get('app:port'), () => {
+          const server = app.listen(config.get('app:port'), config.get('app:host'), () => {
             const configEmitter = medUtils.activateHeartbeat(config.get('mediator:api'));
             configEmitter.on('config', newConfig => {
               logger.info('Received updated config:', newConfig);
@@ -253,7 +253,7 @@ function start(callback) {
   } else {
     logger.info('Running client registry as a stand alone');
     const app = appRoutes();
-    const server = https.createServer(serverOpts, app).listen(config.get('app:port'), () => {
+    const server = https.createServer(serverOpts, app).listen(config.get('app:port'), config.get('app:host'), () => {
       prerequisites.init((err) => {
         if (err) {
           process.exit();

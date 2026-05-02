@@ -1,7 +1,7 @@
 module.exports = {
   publicPath: "/crux",
   outputDir: "../server/gui",
-  transpileDependencies: ["vuetify"],
+  transpileDependencies: ["vuetify", "fhirpath", "@lhncbc/ucum-lhc"],
   devServer: {
     host: "localhost",
     proxy: {

@@ -1,2 +1,7 @@
 # modified configs
 config_development.json
+server/node_modules
+ui/node_modules
+server/gui
+.git
+.idea

@@ -2,30 +2,59 @@ const winston = require('winston');
 const moment = require('moment');
 require('winston-daily-rotate-file');
 const fs = require('fs');
-const logDir = '/var/log';
+const path = require('path');
 const logPrefix = 'openclientregistry-';
 const maxLogFiles = 10;
 const logDatePattern = 'YYYY-MM-DD-HH';
 let transports = [ new winston.transports.Console() ];
+
+function resolveLogDir() {
+  const candidateDirs = [
+    process.env.OPENCR_LOG_DIR,
+    '/var/log',
+    path.join(__dirname, '..', 'logs')
+  ].filter(Boolean);
+
+  for (const candidate of candidateDirs) {
+    try {
+      fs.mkdirSync(candidate, { recursive: true });
+      fs.accessSync(candidate, fs.constants.W_OK);
+      return candidate;
+    } catch (err) {
+      continue;
+    }
+  }
+
+  return null;
+}
+
+const logDir = resolveLogDir();
+
 if ( process.env.NODE_ENV !== "test" ) {
-  let transport = new winston.transports.DailyRotateFile({
-    dirname: logDir,
-    filename: `${logPrefix}%DATE%.log`,
-    datePattern: logDatePattern,
-    zippedArchive: true,
-    maxSize: '10m',
-    maxFiles: '14d',
-  });
-  transport.on('rotate', () => {
-    deleteOldLogs();
-  });
-  transport.on('new', () => {
-    deleteOldLogs();
-  });
-  transport.on('archive', () => {
-    deleteOldLogs();
-  });
-  transports.push( transport );
+  if (logDir) {
+    try {
+      let transport = new winston.transports.DailyRotateFile({
+        dirname: logDir,
+        filename: `${logPrefix}%DATE%.log`,
+        datePattern: logDatePattern,
+        zippedArchive: true,
+        maxSize: '10m',
+        maxFiles: '14d',
+      });
+      transport.on('rotate', () => {
+        deleteOldLogs();
+      });
+      transport.on('new', () => {
+        deleteOldLogs();
+      });
+      transport.on('archive', () => {
+        deleteOldLogs();
+      });
+      transports.push( transport );
+    } catch (err) {
+      console.warn(`Falling back to console-only logging: ${err.message}`);
+    }
+  }
 }
 
 const logger = winston.createLogger({
@@ -44,7 +73,13 @@ const logger = winston.createLogger({
 });
 
 function deleteOldLogs() {
+  if (!logDir) {
+    return;
+  }
   fs.readdir(logDir, (err, files) => {
+    if (err) {
+      return;
+    }
     let logs = files.filter((file) => {
       return file.startsWith(logPrefix);
     });

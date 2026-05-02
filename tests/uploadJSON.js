@@ -1,8 +1,10 @@
 const fs = require('fs');
-const async = require('async');
 const path = require('path');
-const request = require('request');
-const uploadResults = require('./uploadResults');
+const requireFallback = require('./requireFallback');
+
+const async = requireFallback('async');
+const request = requireFallback('request');
+process.env.NODE_ENV = process.env.NODE_ENV || 'test';
 const logger = require('../server/lib/winston');
 
 if (!process.argv[2]) {
@@ -38,7 +40,7 @@ if (extTrueLinks !== '.csv') {
   csvTrueLinks = '';
 }
 
-const patients = require(jsonFile);
+const patients = require(path.resolve(process.cwd(), jsonFile));
 
 logger.info('Upload started ...');
 
@@ -74,7 +76,7 @@ async.eachOfSeries(bundle.entry, (entry, index, nxtEntry) => {
     password: 'openmrs'
   };
   const options = {
-    url: 'https://localhost:3000/fhir/' + entry.resource.resourceType,
+    url: 'https://localhost:3001/fhir/' + entry.resource.resourceType,
     agentOptions,
     // auth,
     json: entry.resource,
@@ -104,6 +106,7 @@ async.eachOfSeries(bundle.entry, (entry, index, nxtEntry) => {
 }, () => {
   console.timeEnd('Total Processing Time');
   if (csvTrueLinks) {
+    const uploadResults = require('./uploadResults');
     uploadResults.uploadResults(csvTrueLinks);
   } else {
     console.log(

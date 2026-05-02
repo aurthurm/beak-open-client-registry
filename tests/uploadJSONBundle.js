@@ -1,8 +1,10 @@
 const fs = require('fs');
-const async = require('async');
+const requireFallback = require('./requireFallback');
+const async = requireFallback('async');
 const path = require('path');
-const request = require('request');
+const request = requireFallback('request');
 const uploadResults = require('./uploadResults');
+process.env.NODE_ENV = process.env.NODE_ENV || 'test';
 const logger = require('../server/lib/winston');
 
 if (!process.argv[2]) {
@@ -38,7 +40,7 @@ if (extTrueLinks !== '.csv') {
   csvTrueLinks = '';
 }
 
-const patients = require(jsonFile);
+const patients = require(path.resolve(process.cwd(), jsonFile));
 
 logger.info('Upload started ...');
 

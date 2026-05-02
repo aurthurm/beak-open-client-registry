@@ -110,7 +110,10 @@ With that config in place we need to volume in this new config file into our `do
 ```yml
   opencr:
     container_name: opencr
-    image: intrahealth/opencr
+    image: client-registry-opencr:latest
+    build:
+      context: .
+      dockerfile: docker/opencr/Dockerfile
     ports:
       - "3000:3000"
     depends_on:
