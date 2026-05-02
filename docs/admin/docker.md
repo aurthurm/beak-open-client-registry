@@ -66,12 +66,12 @@ cp config/config_docker_template.json config/config_docker.json
 
 ```sh
 # from client-registry/server
-sudo NODE_ENV=docker node lib/app.js
+NODE_ENV=docker bun run src/app.ts
 ```
 
-> `sudo` is needed as OpenCR requires access to /var/log for logging. This requirement may be changed in the future.
+> `sudo` is no longer required for logging because OpenCR now falls back to a writable local log directory when `/var/log` is unavailable.
 
-- Visit the UI at: [https://localhost:3000/crux](https://localhost:3000/crux)
+- Visit the UI at: [https://localhost:3001/crux](https://localhost:3001/crux)
   - **Default username**: root@intrahealth.org
   - **Default password**: intrahealth
 
@@ -83,7 +83,7 @@ docker-compose -f docker-compose.cicd.yml up -d
 
 > The flag `-d` runs the processes in the background.
 
-- Visit the UI at: [https://localhost:3000/crux](https://localhost:3000/crux)
+- Visit the UI at: [https://localhost:3001/crux](https://localhost:3001/crux)
   - **Default username**: root@intrahealth.org
   - **Default password**: intrahealth
 
@@ -115,7 +115,7 @@ With that config in place we need to volume in this new config file into our `do
       context: .
       dockerfile: docker/opencr/Dockerfile
     ports:
-      - "3000:3000"
+      - "3001:3000"
     depends_on:
       - test-fhir
       - es
@@ -135,7 +135,7 @@ docker-compose -f docker-compose.cicd.yml up -d
 
 > The flag `-d` runs the processes in the background.
 
-- Visit the UI at: [https://localhost:3000/crux](https://localhost:3000/crux)
+- Visit the UI at: [https://localhost:3001/crux](https://localhost:3001/crux)
   - **Default username**: root@intrahealth.org
   - **Default password**: intrahealth
 

@@ -9,6 +9,16 @@
             "date": 1777743667642,
             "name": "/home/administrator/Documents/Development/registries/client-registry/server/logs/openclientregistry-2026-05-02-19.log",
             "hash": "fe58f0df54fcd36181b0a34c2ee226db5d5a2329d4dbc3de3ae6b4f5c450d554"
+        },
+        {
+            "date": 1777748896631,
+            "name": "/home/administrator/Documents/Development/registries/client-registry/server/logs/openclientregistry-2026-05-02-21.log",
+            "hash": "75a54220a24c9f9b5f7cbe8f94a52067"
+        },
+        {
+            "date": 1777752330320,
+            "name": "/home/administrator/Documents/Development/registries/client-registry/server/logs/openclientregistry-2026-05-02-22.log",
+            "hash": "e561617cab485ba38801a2e51035315beb59f89e31c23635f238ffc1d617b9cd"
         }
     ],
     "hashType": "sha256"

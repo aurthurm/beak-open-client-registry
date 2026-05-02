@@ -2,6 +2,10 @@
 
 This documents how to use Ansible playbooks to set up a production-like server installation. It differs from a production installation in that certificates must not be self-signed in a production environment.
 
+For the checked-in self-signed test certificates, when to regenerate them, and the exact commands, see:
+
+- [Certificates](certificates.md)
+
 > These steps are for installing on a server OS directly and require experience with remote configuration and Linux administration.
 
 ## Preparation
@@ -76,7 +80,7 @@ Visit: https://ipaddress:3000/crux
 HTTPS must be used.
 
 !!! warning
-    If not running localhost, follow the next steps to create self-signed server and client certs, and copy them onto the server using an Ansible script below.
+    If not running localhost, follow the next steps to create self-signed server and client certs, and copy them onto the server using an Ansible script below. The exact certificate generation commands are documented in [Certificates](certificates.md).
 
 ### Certificates (Required if not using localhost)
 

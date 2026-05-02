@@ -65,10 +65,16 @@ See the [OpenHIM user guide](https://openhim.readthedocs.io/en/latest/user-guide
 
 ## Non-Production
 
-In non-production settings only may self-signed certificates be created for testing and demonstrations. An example is as follows:
+In non-production settings only may self-signed certificates be created for testing and demonstrations.
+
+Use the detailed certificate guide for the exact generation steps and for the cases where regeneration is required:
+
+- [Certificates](certificates.md)
+
+If you are creating a new client identity for a local demo, the pattern is:
+
 ```sh
 openssl req -newkey rsa:4096 -keyout dhis2_key.pem -out dhis2_csr.pem -nodes -days 365 -subj "/CN=dhis2"
 openssl x509 -req -in dhis2_csr.pem -CA ../certificates/server_cert.pem -CAkey ../certificates/server_key.pem -out dhis2_cert.pem -set_serial 01 -days 36500
 openssl pkcs12 -export -in dhis2_cert.pem -inkey dhis2_key.pem -out dhis2.p12
 ```
-

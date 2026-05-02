@@ -8,12 +8,16 @@ The way that this works is that a server creates a certificate for a client. The
 
 There is a set of generated certificates for testing and demonstrations. They are not appropriate for production.
 
+If you need to regenerate the checked-in test certificates or want to understand when that is required, see:
+
+- [Certificates](certificates.md)
+
 ## A Simple CLI Query
 
 From inside the `/client-registry/server` directory, send a cURL query using the provided example JSON file:
 
 ```sh
-curl --cert sampleclientcertificates/openmrs.p12 --cert-type p12 --cacert certificates/server_cert.pem -d @../DemoData/patient1_openmrs.json -H "Content-Type: application/json" -XPOST https://localhost:3000/fhir/Patient
+curl --cert sampleclientcertificates/openmrs.p12 --cert-type p12 --cacert certificates/server_cert.pem -d @../DemoData/patient1_openmrs.json -H "Content-Type: application/json" -XPOST https://localhost:3001/fhir/Patient
 ```
 
 Should result in a successful result in stdout:

@@ -99,7 +99,7 @@ The minimum changes to start a running standalone system are:
 Run the server from inside client-registry/server:
 
 ```
-node lib/app.js
+NODE_ENV=development APP__PORT=8001 bun run src/app.ts
 ```
 
 ## OpenHIM (Optional)

@@ -51,7 +51,7 @@ client-registry/
 
 **Build output:** `pnpm build` in `ui-react/` writes static assets to `server/gui/`, where Express already serves them at `/crux`.
 
-**Dev proxy:** `vite.config.ts` proxies `/ocrux/*` → `http://localhost:3000` (Express dev server).
+**Dev proxy:** `vite.config.ts` proxies `/ocrux/*` → `http://localhost:8001` (backend dev server).
 
 ---
 

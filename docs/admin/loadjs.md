@@ -31,12 +31,12 @@ json: entry.resource,
 
 Edit uploadCSV_mychanges.js. If not running OpenHIM then change:
 * remove `auth` and change it to `agentOptions`
-* Change the IP address/hostname as required, for example for Docker: 'https://localhost:3000/Patient'.
+* Change the IP address/hostname as required, for example for Docker: 'https://localhost:3001/Patient'.
 
 After the edits, the code block looks like this:
 ```js
 const options = {
-url: 'https://localhost:3000/Patient',
+url: 'https://localhost:3001/Patient',
 agentOptions,
 json: entry.resource,
 };
@@ -54,4 +54,3 @@ sudo node uploadCSV_mychanges.js uganda_data_v21_20201501.csv
 
 !!! caution
     The script may take several hours to process all of the records.
-

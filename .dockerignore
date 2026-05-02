@@ -2,6 +2,8 @@
 config_development.json
 server/node_modules
 ui/node_modules
+ui-react/node_modules
+ui-react/dist
 server/gui
 .git
 .idea

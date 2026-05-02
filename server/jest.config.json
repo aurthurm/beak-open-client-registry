@@ -1,0 +1,10 @@
+{
+  "clearMocks": true,
+  "coverageDirectory": "coverage",
+  "testEnvironment": "node",
+  "testPathIgnorePatterns": [
+    "resources/",
+    "__tests__/e2e/add-invalid-patient.ts",
+    "__tests__/e2e/resetTestData.ts"
+  ]
+}

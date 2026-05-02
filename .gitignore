@@ -32,3 +32,7 @@ ansible.p12
 
 # venv
 venv/
+
+# runtime logs
+server/logs/*.log
+server/logs/*.gz

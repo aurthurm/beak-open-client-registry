@@ -113,18 +113,21 @@ cp config/config_development_template.json config/config_development.json
 The minimum changes to start a running standalone system are:
 
 * Change `fhirServer.baseURL` to "http://localhost:8080/baseR4/"
+* Keep the local server port at `8001` or override it with `APP__PORT=8001`
 
 Run the server from inside client-registry/server:
 
 ```
 # from client-registry/server
-sudo NODE_ENV=development node lib/app.js
+NODE_ENV=development APP__PORT=8001 bun run src/app.ts
 ```
 
-* Visit the UI at: [https://localhost:3000/crux](https://localhost:3000/crux)
+* Visit the UI at: [https://localhost:3001/crux](https://localhost:3001/crux)
   * **Default username**: root@intrahealth.org
   * **Default password**: intrahealth
 
-OpenCR may require access to /var/log for logging. This requirement may be changed in the future.
+The TanStack UI dev server also runs on `3001` and proxies `/ocrux` to the backend on `8001`. If you need to change that during manual testing, set `OCRUX_ORIGIN` for server-side requests or `VITE_OCRUX_ORIGIN` for the browser bundle.
+
+OpenCR will try `/var/log` first, but the Bun runtime now falls back to `server/logs` or console-only logging if `/var/log` is not writable.
 
 Congratulations! Now it's time to run a [query](../admin/queries.md).
