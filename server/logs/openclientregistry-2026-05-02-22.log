@@ -1,0 +1,16 @@
+2026-05-02 22:05:30 [32minfo[39m: [32mRunning client registry as a stand alone[39m
+2026-05-02 22:05:30 [32minfo[39m: [32mChecking if all elasticsearch plugins are installed[39m
+2026-05-02 22:05:30 [32minfo[39m: [32mChecking if all elasticsearch plugins are installed[39m
+2026-05-02 22:05:30 [32minfo[39m: [32mLoading Patient.StructureDefinition.xml into FHIR server...[39m
+2026-05-02 22:05:30 [32minfo[39m: [32mSaving StructureDefinition - Patient[39m
+2026-05-02 22:05:30 [31merror[39m: [31mIt seems like opensearch/elasticsearch is not running, please check to ensure it is up and running[39m
+2026-05-02 22:05:30 [31merror[39m: [31mAn error has occured while adding probabilistic jaro winkler script for elasticsearch[39m
+2026-05-02 22:05:30 [31merror[39m: [31mThe socket connection was closed unexpectedly. For more information, pass `verbose: true` in the second argument to fetch()[39m
+2026-05-02 22:05:33 [32minfo[39m: [32mRunning client registry as a stand alone[39m
+2026-05-02 22:05:33 [32minfo[39m: [32mChecking if all elasticsearch plugins are installed[39m
+2026-05-02 22:05:33 [32minfo[39m: [32mChecking if all elasticsearch plugins are installed[39m
+2026-05-02 22:05:33 [32minfo[39m: [32mLoading Patient.StructureDefinition.xml into FHIR server...[39m
+2026-05-02 22:05:33 [32minfo[39m: [32mSaving StructureDefinition - Patient[39m
+2026-05-02 22:05:33 [31merror[39m: [31mIt seems like opensearch/elasticsearch is not running, please check to ensure it is up and running[39m
+2026-05-02 22:05:33 [31merror[39m: [31mAn error has occured while adding probabilistic jaro winkler script for elasticsearch[39m
+2026-05-02 22:05:33 [31merror[39m: [31mThe socket connection was closed unexpectedly. For more information, pass `verbose: true` in the second argument to fetch()[39m
