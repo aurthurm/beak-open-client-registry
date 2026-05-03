@@ -1,0 +1,142 @@
+2026-05-02 19:44:46 [32minfo[39m: [32mRunning client registry as a stand alone[39m
+2026-05-02 19:44:46 [32minfo[39m: [32mChecking if all elasticsearch plugins are installed[39m
+2026-05-02 19:44:46 [32minfo[39m: [32mServer is running and listening on port: 3000[39m
+2026-05-02 19:44:46 [32minfo[39m: [32mAll plugins are available[39m
+2026-05-02 19:44:46 [32minfo[39m: [32mJaro winkler loaded successfully[39m
+2026-05-02 19:44:46 [32minfo[39m: [32mLoading CRBrokenMatch.StructureDefinition.xml into FHIR server...[39m
+2026-05-02 19:44:46 [32minfo[39m: [32mSaving StructureDefinition - CRBrokenMatch[39m
+2026-05-02 19:44:47 [32minfo[39m: [32mhttp://localhost:8081/hapi-fhir-jpaserver/fhir/StructureDefinition/CRBrokenMatch: 201[39m
+2026-05-02 19:44:47 [32minfo[39m: [32mhttp://localhost:8080/hapi-fhir-jpaserver/fhir/StructureDefinition/CRBrokenMatch/_history/1[39m
+2026-05-02 19:44:47 [32minfo[39m: [32mLoading CRPatient.StructureDefinition.xml into FHIR server...[39m
+2026-05-02 19:44:47 [32minfo[39m: [32mSaving StructureDefinition - CRPatient[39m
+2026-05-02 19:44:47 [32minfo[39m: [32mhttp://localhost:8081/hapi-fhir-jpaserver/fhir/StructureDefinition/CRPatient: 201[39m
+2026-05-02 19:44:47 [32minfo[39m: [32mhttp://localhost:8080/hapi-fhir-jpaserver/fhir/StructureDefinition/CRPatient/_history/1[39m
+2026-05-02 19:44:47 [32minfo[39m: [32mLoading OCRUser.StructureDefinition.xml into FHIR server...[39m
+2026-05-02 19:44:47 [32minfo[39m: [32mSaving StructureDefinition - OCRUser[39m
+2026-05-02 19:44:47 [32minfo[39m: [32mhttp://localhost:8081/hapi-fhir-jpaserver/fhir/StructureDefinition/OCRUser: 201[39m
+2026-05-02 19:44:47 [32minfo[39m: [32mhttp://localhost:8080/hapi-fhir-jpaserver/fhir/StructureDefinition/OCRUser/_history/1[39m
+2026-05-02 19:44:47 [32minfo[39m: [32mLoading OCRUserDetails.StructureDefinition.xml into FHIR server...[39m
+2026-05-02 19:44:47 [32minfo[39m: [32mSaving StructureDefinition - OCRUserDetails[39m
+2026-05-02 19:44:47 [32minfo[39m: [32mhttp://localhost:8081/hapi-fhir-jpaserver/fhir/StructureDefinition/OCRUserDetails: 201[39m
+2026-05-02 19:44:47 [32minfo[39m: [32mhttp://localhost:8080/hapi-fhir-jpaserver/fhir/StructureDefinition/OCRUserDetails/_history/1[39m
+2026-05-02 19:44:47 [32minfo[39m: [32mLoading Patient.StructureDefinition.xml into FHIR server...[39m
+2026-05-02 19:44:47 [32minfo[39m: [32mSaving StructureDefinition - Patient[39m
+2026-05-02 19:44:47 [32minfo[39m: [32mhttp://localhost:8081/hapi-fhir-jpaserver/fhir/StructureDefinition/Patient: 201[39m
+2026-05-02 19:44:47 [32minfo[39m: [32mhttp://localhost:8080/hapi-fhir-jpaserver/fhir/StructureDefinition/Patient/_history/1[39m
+2026-05-02 19:44:47 [32minfo[39m: [32mLoading person-username.SearchParameter.json into FHIR server...[39m
+2026-05-02 19:44:47 [32minfo[39m: [32mSaving SearchParameter - ocr-person-username[39m
+2026-05-02 19:44:48 [32minfo[39m: [32mhttp://localhost:8081/hapi-fhir-jpaserver/fhir/SearchParameter/ocr-person-username: 201[39m
+2026-05-02 19:44:48 [32minfo[39m: [32mhttp://localhost:8080/hapi-fhir-jpaserver/fhir/SearchParameter/ocr-person-username/_history/1[39m
+2026-05-02 19:44:48 [32minfo[39m: [32mLoading PatientDisplay.json into FHIR server...[39m
+2026-05-02 19:44:48 [32minfo[39m: [32mSaving Basic - patientdisplaypage[39m
+2026-05-02 19:44:48 [32minfo[39m: [32mhttp://localhost:8081/hapi-fhir-jpaserver/fhir/Basic/patientdisplaypage: 201[39m
+2026-05-02 19:44:48 [32minfo[39m: [32mhttp://localhost:8080/hapi-fhir-jpaserver/fhir/Basic/patientdisplaypage/_history/1[39m
+2026-05-02 19:44:48 [32minfo[39m: [32mLoading PatientRelationship.json into FHIR server...[39m
+2026-05-02 19:44:48 [32minfo[39m: [32mSaving Basic - patientreport[39m
+2026-05-02 19:44:48 [32minfo[39m: [32mhttp://localhost:8081/hapi-fhir-jpaserver/fhir/Basic/patientreport: 201[39m
+2026-05-02 19:44:48 [32minfo[39m: [32mhttp://localhost:8080/hapi-fhir-jpaserver/fhir/Basic/patientreport/_history/1[39m
+2026-05-02 19:44:48 [32minfo[39m: [32mLoading CodeSystem-address-type.json into FHIR server...[39m
+2026-05-02 19:44:48 [32minfo[39m: [32mSaving CodeSystem - address-type[39m
+2026-05-02 19:44:49 [32minfo[39m: [32mhttp://localhost:8081/hapi-fhir-jpaserver/fhir/CodeSystem/address-type: 201[39m
+2026-05-02 19:44:49 [32minfo[39m: [32mhttp://localhost:8080/hapi-fhir-jpaserver/fhir/CodeSystem/address-type/_history/1[39m
+2026-05-02 19:44:49 [32minfo[39m: [32mLoading CodeSystem-address-use.json into FHIR server...[39m
+2026-05-02 19:44:49 [32minfo[39m: [32mSaving CodeSystem - address-use[39m
+2026-05-02 19:44:49 [32minfo[39m: [32mhttp://localhost:8081/hapi-fhir-jpaserver/fhir/CodeSystem/address-use: 201[39m
+2026-05-02 19:44:49 [32minfo[39m: [32mhttp://localhost:8080/hapi-fhir-jpaserver/fhir/CodeSystem/address-use/_history/1[39m
+2026-05-02 19:44:49 [32minfo[39m: [32mLoading CodeSystem-administrative-gender.json into FHIR server...[39m
+2026-05-02 19:44:49 [32minfo[39m: [32mSaving CodeSystem - administrative-gender[39m
+2026-05-02 19:44:49 [32minfo[39m: [32mhttp://localhost:8081/hapi-fhir-jpaserver/fhir/CodeSystem/administrative-gender: 201[39m
+2026-05-02 19:44:49 [32minfo[39m: [32mhttp://localhost:8080/hapi-fhir-jpaserver/fhir/CodeSystem/administrative-gender/_history/1[39m
+2026-05-02 19:44:49 [32minfo[39m: [32mLoading CodeSystem-contact-point-system.json into FHIR server...[39m
+2026-05-02 19:44:49 [32minfo[39m: [32mSaving CodeSystem - contact-point-system[39m
+2026-05-02 19:44:49 [32minfo[39m: [32mhttp://localhost:8081/hapi-fhir-jpaserver/fhir/CodeSystem/contact-point-system: 201[39m
+2026-05-02 19:44:49 [32minfo[39m: [32mhttp://localhost:8080/hapi-fhir-jpaserver/fhir/CodeSystem/contact-point-system/_history/1[39m
+2026-05-02 19:44:49 [32minfo[39m: [32mLoading CodeSystem-contact-point-use.json into FHIR server...[39m
+2026-05-02 19:44:49 [32minfo[39m: [32mSaving CodeSystem - contact-point-use[39m
+2026-05-02 19:44:49 [32minfo[39m: [32mhttp://localhost:8081/hapi-fhir-jpaserver/fhir/CodeSystem/contact-point-use: 201[39m
+2026-05-02 19:44:49 [32minfo[39m: [32mhttp://localhost:8080/hapi-fhir-jpaserver/fhir/CodeSystem/contact-point-use/_history/1[39m
+2026-05-02 19:44:49 [32minfo[39m: [32mLoading CodeSystem-identifier-use.json into FHIR server...[39m
+2026-05-02 19:44:49 [32minfo[39m: [32mSaving CodeSystem - identifier-use[39m
+2026-05-02 19:44:49 [32minfo[39m: [32mhttp://localhost:8081/hapi-fhir-jpaserver/fhir/CodeSystem/identifier-use: 201[39m
+2026-05-02 19:44:49 [32minfo[39m: [32mhttp://localhost:8080/hapi-fhir-jpaserver/fhir/CodeSystem/identifier-use/_history/1[39m
+2026-05-02 19:44:49 [32minfo[39m: [32mLoading CodeSystem-v2-0131.json into FHIR server...[39m
+2026-05-02 19:44:49 [32minfo[39m: [32mSaving CodeSystem - v2-0131[39m
+2026-05-02 19:44:49 [32minfo[39m: [32mhttp://localhost:8081/hapi-fhir-jpaserver/fhir/CodeSystem/v2-0131: 201[39m
+2026-05-02 19:44:49 [32minfo[39m: [32mhttp://localhost:8080/hapi-fhir-jpaserver/fhir/CodeSystem/v2-0131/_history/1[39m
+2026-05-02 19:44:49 [32minfo[39m: [32mLoading CodeSystem-v3-MaritalStatus.json into FHIR server...[39m
+2026-05-02 19:44:49 [32minfo[39m: [32mSaving CodeSystem - v3-MaritalStatus[39m
+2026-05-02 19:44:49 [32minfo[39m: [32mhttp://localhost:8081/hapi-fhir-jpaserver/fhir/CodeSystem/v3-MaritalStatus: 201[39m
+2026-05-02 19:44:49 [32minfo[39m: [32mhttp://localhost:8080/hapi-fhir-jpaserver/fhir/CodeSystem/v3-MaritalStatus/_history/1[39m
+2026-05-02 19:44:49 [32minfo[39m: [32mLoading CodeSystem-v3-NullFlavor.json into FHIR server...[39m
+2026-05-02 19:44:49 [32minfo[39m: [32mSaving CodeSystem - v3-NullFlavor[39m
+2026-05-02 19:44:49 [32minfo[39m: [32mhttp://localhost:8081/hapi-fhir-jpaserver/fhir/CodeSystem/v3-NullFlavor: 201[39m
+2026-05-02 19:44:49 [32minfo[39m: [32mhttp://localhost:8080/hapi-fhir-jpaserver/fhir/CodeSystem/v3-NullFlavor/_history/1[39m
+2026-05-02 19:44:49 [32minfo[39m: [32mLoading ValueSet-address-type.json into FHIR server...[39m
+2026-05-02 19:44:49 [32minfo[39m: [32mSaving ValueSet - address-type[39m
+2026-05-02 19:44:49 [32minfo[39m: [32mhttp://localhost:8081/hapi-fhir-jpaserver/fhir/ValueSet/address-type: 201[39m
+2026-05-02 19:44:49 [32minfo[39m: [32mhttp://localhost:8080/hapi-fhir-jpaserver/fhir/ValueSet/address-type/_history/1[39m
+2026-05-02 19:44:49 [32minfo[39m: [32mLoading ValueSet-address-use.json into FHIR server...[39m
+2026-05-02 19:44:49 [32minfo[39m: [32mSaving ValueSet - address-use[39m
+2026-05-02 19:44:49 [32minfo[39m: [32mhttp://localhost:8081/hapi-fhir-jpaserver/fhir/ValueSet/address-use: 201[39m
+2026-05-02 19:44:49 [32minfo[39m: [32mhttp://localhost:8080/hapi-fhir-jpaserver/fhir/ValueSet/address-use/_history/1[39m
+2026-05-02 19:44:49 [32minfo[39m: [32mLoading ValueSet-administrative-gender.json into FHIR server...[39m
+2026-05-02 19:44:49 [32minfo[39m: [32mSaving ValueSet - administrative-gender[39m
+2026-05-02 19:44:49 [32minfo[39m: [32mhttp://localhost:8081/hapi-fhir-jpaserver/fhir/ValueSet/administrative-gender: 201[39m
+2026-05-02 19:44:49 [32minfo[39m: [32mhttp://localhost:8080/hapi-fhir-jpaserver/fhir/ValueSet/administrative-gender/_history/1[39m
+2026-05-02 19:44:49 [32minfo[39m: [32mLoading ValueSet-contact-point-system.json into FHIR server...[39m
+2026-05-02 19:44:49 [32minfo[39m: [32mSaving ValueSet - contact-point-system[39m
+2026-05-02 19:44:49 [32minfo[39m: [32mhttp://localhost:8081/hapi-fhir-jpaserver/fhir/ValueSet/contact-point-system: 201[39m
+2026-05-02 19:44:49 [32minfo[39m: [32mhttp://localhost:8080/hapi-fhir-jpaserver/fhir/ValueSet/contact-point-system/_history/1[39m
+2026-05-02 19:44:49 [32minfo[39m: [32mLoading ValueSet-contact-point-use.json into FHIR server...[39m
+2026-05-02 19:44:49 [32minfo[39m: [32mSaving ValueSet - contact-point-use[39m
+2026-05-02 19:44:49 [32minfo[39m: [32mhttp://localhost:8081/hapi-fhir-jpaserver/fhir/ValueSet/contact-point-use: 201[39m
+2026-05-02 19:44:49 [32minfo[39m: [32mhttp://localhost:8080/hapi-fhir-jpaserver/fhir/ValueSet/contact-point-use/_history/1[39m
+2026-05-02 19:44:49 [32minfo[39m: [32mLoading ValueSet-identifier-use.json into FHIR server...[39m
+2026-05-02 19:44:49 [32minfo[39m: [32mSaving ValueSet - identifier-use[39m
+2026-05-02 19:44:49 [32minfo[39m: [32mhttp://localhost:8081/hapi-fhir-jpaserver/fhir/ValueSet/identifier-use: 201[39m
+2026-05-02 19:44:49 [32minfo[39m: [32mhttp://localhost:8080/hapi-fhir-jpaserver/fhir/ValueSet/identifier-use/_history/1[39m
+2026-05-02 19:44:49 [32minfo[39m: [32mLoading ValueSet-languages.json into FHIR server...[39m
+2026-05-02 19:44:49 [32minfo[39m: [32mSaving ValueSet - languages[39m
+2026-05-02 19:44:50 [32minfo[39m: [32mhttp://localhost:8081/hapi-fhir-jpaserver/fhir/ValueSet/languages: 201[39m
+2026-05-02 19:44:50 [32minfo[39m: [32mhttp://localhost:8080/hapi-fhir-jpaserver/fhir/ValueSet/languages/_history/1[39m
+2026-05-02 19:44:50 [32minfo[39m: [32mLoading ValueSet-link-type.json into FHIR server...[39m
+2026-05-02 19:44:50 [32minfo[39m: [32mSaving ValueSet - link-type[39m
+2026-05-02 19:44:50 [32minfo[39m: [32mhttp://localhost:8081/hapi-fhir-jpaserver/fhir/ValueSet/link-type: 201[39m
+2026-05-02 19:44:50 [32minfo[39m: [32mhttp://localhost:8080/hapi-fhir-jpaserver/fhir/ValueSet/link-type/_history/1[39m
+2026-05-02 19:44:50 [32minfo[39m: [32mLoading ValueSet-marital-status.json into FHIR server...[39m
+2026-05-02 19:44:50 [32minfo[39m: [32mSaving ValueSet - marital-status[39m
+2026-05-02 19:44:50 [32minfo[39m: [32mhttp://localhost:8081/hapi-fhir-jpaserver/fhir/ValueSet/marital-status: 201[39m
+2026-05-02 19:44:50 [32minfo[39m: [32mhttp://localhost:8080/hapi-fhir-jpaserver/fhir/ValueSet/marital-status/_history/1[39m
+2026-05-02 19:44:50 [32minfo[39m: [32mLoading ValueSet-patient-contactrelationship.json into FHIR server...[39m
+2026-05-02 19:44:50 [32minfo[39m: [32mSaving ValueSet - patient-contactrelationship[39m
+2026-05-02 19:44:50 [32minfo[39m: [32mhttp://localhost:8081/hapi-fhir-jpaserver/fhir/ValueSet/patient-contactrelationship: 201[39m
+2026-05-02 19:44:50 [32minfo[39m: [32mhttp://localhost:8080/hapi-fhir-jpaserver/fhir/ValueSet/patient-contactrelationship/_history/1[39m
+2026-05-02 19:44:50 [32minfo[39m: [32mLoading admin.OCRUser.json into FHIR server...[39m
+2026-05-02 19:44:50 [32minfo[39m: [32mSaving Person - default-admin-user[39m
+2026-05-02 19:44:50 [32minfo[39m: [32mhttp://localhost:8081/hapi-fhir-jpaserver/fhir/Person/default-admin-user: 201[39m
+2026-05-02 19:44:50 [32minfo[39m: [32mhttp://localhost:8080/hapi-fhir-jpaserver/fhir/Person/default-admin-user/_history/1[39m
+2026-05-02 19:44:50 [32minfo[39m: [32mDone loading required resources[39m
+2026-05-02 19:44:50 [32minfo[39m: [32mUpdating config file[39m
+2026-05-02 19:44:50 [32minfo[39m: [32mDone updating config file[39m
+2026-05-02 19:44:50 [32minfo[39m: [32mDone loading Default data[39m
+2026-05-02 19:44:50 [32minfo[39m: [32mGetting http://localhost:8081/hapi-fhir-jpaserver/fhir/Basic/patientreport from server[39m
+2026-05-02 19:44:50 [32minfo[39m: [32mprocessing relationship ID patientreport[39m
+2026-05-02 19:44:50 [32minfo[39m: [32mSetting maximum compilation rate[39m
+2026-05-02 19:44:50 [32minfo[39m: [32mmaximum compilation rate updated successfully[39m
+2026-05-02 19:44:50 [32minfo[39m: [32mCreating analyzer into elasticsearch for index patients[39m
+2026-05-02 19:44:50 [32minfo[39m: [32mAnalyzer already exist into elasticsearch, not creating[39m
+2026-05-02 19:44:50 [32minfo[39m: [32mAdding mappings into elasticsearch for index patients[39m
+2026-05-02 19:44:50 [32minfo[39m: [32mMappings added successfully into elasticsearch[39m
+2026-05-02 19:44:50 [32minfo[39m: [32mGetting http://localhost:8081/hapi-fhir-jpaserver/fhir/Patient/_history?_since=1970-10-05T08%3A15%3A12 from server[39m
+2026-05-02 19:44:50 [32minfo[39m: [32mWritting resource data for resource Patient into elastic search[39m
+2026-05-02 19:44:50 [32minfo[39m: [32mDone Writting resource data for resource patients into elastic search[39m
+2026-05-02 19:44:50 [32minfo[39m: [32mUpdating config file[39m
+2026-05-02 19:44:50 [32minfo[39m: [32mDone updating config file[39m
+2026-05-02 19:45:20 [32minfo[39m: [32mRunning client registry as a stand alone[39m
+2026-05-02 19:45:20 [32minfo[39m: [32mChecking if all elasticsearch plugins are installed[39m
+2026-05-02 19:45:20 [32minfo[39m: [32mServer is running and listening on port: 3000[39m
+2026-05-02 19:45:20 [31merror[39m: [31mAn error has occured while adding probabilistic jaro winkler script for elasticsearch[39m
+2026-05-02 19:45:20 [31merror[39m: [31mIt seems like opensearch/elasticsearch is not running, please check to ensure it is up and running[39m
+2026-05-02 19:45:20 [32minfo[39m: [32mLoading CRBrokenMatch.StructureDefinition.xml into FHIR server...[39m
+2026-05-02 19:45:20 [32minfo[39m: [32mSaving StructureDefinition - CRBrokenMatch[39m
+2026-05-02 19:45:20 [31merror[39m: [31msocket hang up[39m

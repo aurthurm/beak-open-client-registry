@@ -17,7 +17,25 @@ services:
     environment:
       - NODE_ENV=cicd
       - HAPI_FHIR_URL=http://fhir:8080/fhir/metadata
-    # networks: 
+    # networks:
+    #   - opencr
+
+  opencrold:
+    container_name: opencrold
+    image: client-registry-opencr:old
+    build:
+      context: .
+      dockerfile: docker/opencr/Dockerfile.old
+    ports:
+      - "3002:3000"
+    depends_on:
+      - fhir
+      - opensearch
+    restart: always
+    environment:
+      - NODE_ENV=cicd
+      - HAPI_FHIR_URL=http://fhir:8080/fhir/metadata
+    # networks:
     #   - opencr
 
   fhir:

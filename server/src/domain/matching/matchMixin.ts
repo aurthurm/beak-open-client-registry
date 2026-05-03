@@ -217,6 +217,9 @@ function createCSVUploadAudEvent(operSummary, auditBundle, req) {
           saveCSVUploadAudiEvent(operSummary.csvCode);
           return resolve();
         }
+        if(!Array.isArray(event.entity)) {
+          event.entity = [];
+        }
         if(event.entity && event.entity.length >= 500) {
           closeCSVAuditEvent(event);
         }

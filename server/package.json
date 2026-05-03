@@ -4,11 +4,11 @@
   "description": "Client Registry",
   "main": "src/app.ts",
   "scripts": {
-    "start": "env NODE_ENV=production bun run src/app.ts",
-    "dev": "env NODE_ENV=development bun run src/app.ts",
-    "typecheck": "bunx tsc -p tsconfig.json --noEmit",
+    "start": "node --import tsx src/app.ts",
+    "dev": "env NODE_ENV=development node --import tsx src/app.ts",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
     "test": "env NODE_ENV=test jest --testPathIgnorePatterns=__tests__/e2e",
-    "e2e": "env NODE_ENV=test bun run __tests__/e2e/resetTestData.ts && jest --detectOpenHandles --testPathPattern=__tests__/e2e"
+    "e2e": "env NODE_ENV=test node --import tsx __tests__/e2e/resetTestData.ts && jest --detectOpenHandles --testPathPattern=__tests__/e2e"
   },
   "keywords": [
     "client registry",
@@ -49,6 +49,7 @@
     "slashes": "^3.0.12",
     "soundex-code": "^2.0.1",
     "supertest": "^7.2.2",
+    "tsx": "^4.19.2",
     "underscore": "^1.13.8",
     "urijs": "^1.19.11",
     "uuid": "^14.0.0",

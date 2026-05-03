@@ -1,3 +1,5 @@
+See [USAGE.md](./USAGE.md) for the test helper overview and command examples.
+
 <table border='3' border='1' cellspacing='0' cellpadding='10'>
             <tr>
               <th><center> <b>Run Date 2020-02-05T23:57:29</b></center></th>

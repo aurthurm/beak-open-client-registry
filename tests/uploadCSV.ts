@@ -3,13 +3,15 @@ const fs = require('fs');
 const requireFallback = require('./requireFallback.ts');
 const { TEST_BACKEND_ORIGIN } = require('./ports.ts');
 const async = requireFallback('async');
-const csv = require('fast-csv');
+const csv = requireFallback('fast-csv');
 const path = require('path');
 const request = requireFallback('request');
-const moment = require('moment');
-const uploadResults = require('./uploadResults.ts');
 process.env.NODE_ENV = process.env.NODE_ENV || 'test';
 const logger = require('../server/src/config/logger.ts').default;
+const CLIENT_CERT = path.resolve(__dirname, '../server/clientCertificates/openmrs_cert.pem');
+const CLIENT_KEY = path.resolve(__dirname, '../server/clientCertificates/openmrs_key.pem');
+const SERVER_CERT = path.resolve(__dirname, '../server/serverCertificates/server_cert.pem');
+const { buildPatientResource } = require('./patientCsvMapper.ts');
 
 if (!process.argv[2]) {
   logger.error('Please specify path to a CSV file');
@@ -47,6 +49,7 @@ if (extTrueLinks !== '.csv') {
 logger.info('Upload started ...');
 const bundles = [];
 const bundle = {};
+const BATCH_SIZE = 250;
 bundle.type = 'batch';
 bundle.resourceType = 'Bundle';
 bundle.entry = [];
@@ -62,94 +65,12 @@ fs.createReadStream(path.resolve(__dirname, '', csvFile))
   .on('data', row => {
     promises.push(
       new Promise((resolve, reject) => {
-        let sex = row['sex'];
-        let given = row['given_name'];
-        let surname = row['surname'];
-        let phone = row['phone_number'];
-        let nationalID = row['uganda_nin'];
-        let ARTNumb = row['art_number'];
-        let birthDate = row['date_of_birth'];
-        if (sex) {
-          sex = sex.trim();
-        }
-        if (given) {
-          given = given.trim();
-        }
-        if (surname) {
-          surname = surname.trim();
-        }
-        if (phone) {
-          phone = phone.trim();
-        }
-        if (nationalID) {
-          nationalID = nationalID.trim();
-        }
-        if (ARTNumb) {
-          ARTNumb = ARTNumb.trim();
-        }
-        if (birthDate) {
-          birthDate = birthDate.trim();
-        }
-        const resource = {
-          meta: {
-            tag: [{
-              system: 'http://openclientregistry.org/fhir/tag/csv',
-              code: '50a0ed16-c2e6-4319-8687-43a6a1a2d1e7',
-              display: 'Uganda CSV Data',
-            }],
-          },
-        };
-        resource.resourceType = 'Patient';
-        if (sex == 'f') {
-          resource.gender = 'female';
-        } else if (sex == 'm') {
-          resource.gender = 'male';
-        }
-        if (birthDate.match(/\d{8,8}/)) {
-          const birthMoment = moment(birthDate);
-          if (birthMoment.isValid()) {
-            resource.birthDate = birthMoment.format('YYYY-MM-DD');
-          }
-        }
-        resource.identifier = [
-          {
-            system: 'http://clientregistry.org/openmrs',
-            value: row['rec_id'].trim(),
-          },
-        ];
-        if (nationalID) {
-          resource.identifier.push({
-            system: 'http://clientregistry.org/nationalid',
-            value: nationalID,
-          });
-        }
-        if (ARTNumb) {
-          resource.identifier.push({
-            system: 'http://clientregistry.org/artnumber',
-            value: ARTNumb,
-          });
-        }
-        if (phone) {
-          resource.telecom = [];
-          resource.telecom.push({
-            system: 'phone',
-            value: phone,
-          });
-        }
-        const name = {};
-        if (given) {
-          name.given = [given];
-        }
-        if (surname) {
-          name.family = surname;
-        }
-        name.use = 'official';
-        resource.name = [name];
+        const resource = buildPatientResource(row, 'Testing CSV');
         bundle.entry.push({
           resource,
         });
-        if (bundle.entry.length === 250) {
-          totalRecords += 250;
+        if (bundle.entry.length === BATCH_SIZE) {
+          totalRecords += BATCH_SIZE;
           const tmpBundle = {
             ...bundle,
           };
@@ -176,11 +97,11 @@ fs.createReadStream(path.resolve(__dirname, '', csvFile))
             (entry, nxtEntry) => {
               count++;
               console.time('Processing Took');
-              console.log('Processing ' + count + ' of ' + totalRecords);
+              console.log(`Processing ${count}/${totalRecords}`);
               const agentOptions = {
-                cert: fs.readFileSync('../server/clientCertificates/openmrs_cert.pem'),
-                key: fs.readFileSync('../server/clientCertificates/openmrs_key.pem'),
-                ca: fs.readFileSync('../server/serverCertificates/server_cert.pem'),
+                cert: fs.readFileSync(CLIENT_CERT),
+                key: fs.readFileSync(CLIENT_KEY),
+                ca: fs.readFileSync(SERVER_CERT),
                 securityOptions: 'SSL_OP_NO_SSLv3',
               };
               const options = {
@@ -216,6 +137,7 @@ fs.createReadStream(path.resolve(__dirname, '', csvFile))
         }, () => {
           console.timeEnd('Total Processing Time');
           if (csvTrueLinks) {
+            const uploadResults = require('./uploadResults.ts');
             uploadResults.uploadResults(csvTrueLinks);
           } else {
             console.log(

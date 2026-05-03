@@ -5,6 +5,7 @@ import nconf from 'nconf';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const env = process.env.NODE_ENV || 'development';
+console.log(`Loading config for environment: ${env}`);
 const decisionRulesFile = env === 'test'
   ? join(__dirname, '../../config/decisionRulesTest.json')
   : join(__dirname, '../../config/decisionRules.json');

@@ -3,13 +3,15 @@ const fs = require('fs');
 const requireFallback = require('./requireFallback.ts');
 const { TEST_BACKEND_ORIGIN } = require('./ports.ts');
 const async = requireFallback('async');
-const csv = require('fast-csv');
+const csv = requireFallback('fast-csv');
 const path = require('path');
 const request = requireFallback('request');
-const moment = require('moment');
-const uploadResults = require('./uploadResults.ts');
 process.env.NODE_ENV = process.env.NODE_ENV || 'test';
 const logger = require('../server/src/config/logger.ts').default;
+const CLIENT_CERT = path.resolve(__dirname, '../server/clientCertificates/openmrs_cert.pem');
+const CLIENT_KEY = path.resolve(__dirname, '../server/clientCertificates/openmrs_key.pem');
+const SERVER_CERT = path.resolve(__dirname, '../server/serverCertificates/server_cert.pem');
+const { buildPatientResource } = require('./patientCsvMapper.ts');
 
 if (!process.argv[2]) {
   logger.error('Please specify path to a CSV file');
@@ -47,11 +49,12 @@ if (extTrueLinks !== '.csv') {
 logger.info('Upload started ...');
 let bundles = [];
 let bundle = {};
+const BATCH_SIZE = 250;
 bundle.type = 'batch';
 bundle.resourceType = 'Bundle';
 bundle.entry = [];
 const promises = [];
-let counter = 1000;
+let totalRecords = 0;
 fs.createReadStream(path.resolve(__dirname, '', csvFile))
   .pipe(
     csv.parse({
@@ -62,70 +65,14 @@ fs.createReadStream(path.resolve(__dirname, '', csvFile))
   .on('data', row => {
     promises.push(
       new Promise((resolve, reject) => {
-        let sex = row['gender'];
-        let dob = row['dob'];
-        let uniqueID = row['Unique ID'];
-        let ARTNumb = row['art_number'];
-        let dhis2FacId = row['dhis2_uid'];
-        if (sex && sex.trim() === 'M') {
-          sex = 'male';
-        } else if (sex && sex.trim() === 'F') {
-          sex = 'female';
-        } else {
-          sex = 'unknown';
-        }
-        if (dob) {
-          dob = dob.trim();
-          dob = moment(dob, 'DD-MMM-YYYY').format('YYYY-MM-DD');
-        }
-        if (uniqueID) {
-          uniqueID = uniqueID.trim();
-        }
-        if (ARTNumb) {
-          ARTNumb = ARTNumb.trim();
-        }
-        if (dhis2FacId) {
-          dhis2FacId = dhis2FacId.trim();
-        }
-        counter++;
-        let resource = {};
-        resource.resourceType = 'Patient';
-        resource.gender = sex;
-        resource.identifier = [
-          {
-            system: 'http://health.go.ug/cr/internalid',
-            value: counter,
-          },
-        ];
-        if (uniqueID) {
-          resource.identifier.push({
-            system: 'http://health.go.ug/cr/uniqueid',
-            value: uniqueID,
-          });
-        }
-        if (ARTNumb) {
-          resource.identifier.push({
-            system: 'http://health.go.ug/cr/artnumber',
-            value: ARTNumb,
-          });
-        }
-        if (dhis2FacId) {
-          resource.identifier.push({
-            system: 'http://health.go.ug/cr/dhis2facid',
-            value: dhis2FacId,
-          });
-        }
-        if (dob) {
-          resource.birthDate = dob;
-        }
+        const resource = buildPatientResource(row, 'Uganda CSV Data');
         bundle.entry.push({
           resource,
         });
-        if (bundle.entry.length === 250) {
-          let tmpBundle = {
+        if (bundle.entry.length === BATCH_SIZE) {
+          bundles.push({
             ...bundle,
-          };
-          bundles.push(tmpBundle);
+          });
           bundle.entry = [];
         }
         resolve();
@@ -133,21 +80,27 @@ fs.createReadStream(path.resolve(__dirname, '', csvFile))
     );
   })
   .on('end', rowCount => {
+    totalRecords = rowCount;
     if (bundle.entry.length > 0) {
       bundles.push(bundle);
     }
     Promise.all(promises).then(() => {
+      let count = 0;
       async.eachSeries(
         bundles,
         (bundle, nxt) => {
+          console.log(
+            'Sending patient batch of ' + bundle.entry.length + ' records'
+          );
           async.eachSeries(
             bundle.entry,
             (entry, nxtEntry) => {
-              console.log('sending a bundle of ' + bundle.entry.length + ' resources');
+              count++;
+              console.log(`Processing ${count}/${totalRecords}`);
               const agentOptions = {
-                cert: fs.readFileSync('../server/clientCertificates/openmrs_cert.pem'),
-                key: fs.readFileSync('../server/clientCertificates/openmrs_key.pem'),
-                ca: fs.readFileSync('../server/serverCertificates/server_cert.pem'),
+                cert: fs.readFileSync(CLIENT_CERT),
+                key: fs.readFileSync(CLIENT_KEY),
+                ca: fs.readFileSync(SERVER_CERT),
                 securityOptions: 'SSL_OP_NO_SSLv3',
               };
               const options = {
@@ -156,7 +109,23 @@ fs.createReadStream(path.resolve(__dirname, '', csvFile))
                 json: entry.resource,
               };
               request.post(options, (err, res, body) => {
-                logger.info(res.headers);
+                if (err) {
+                  logger.error('An error has occured');
+                  logger.error(err);
+                  return nxtEntry();
+                }
+                if (!res || !res.headers) {
+                  logger.error('Something went wrong, this transaction was not successfully, please cross check the URL and authentication details;');
+                  return nxtEntry();
+                }
+                if (res.headers.location) {
+                  logger.info({
+                    'Patient ID': res.headers.location,
+                    'Patient CRUID': res.headers.locationcruid,
+                  });
+                } else {
+                  logger.error('Something went wrong, no CRUID created');
+                }
                 return nxtEntry();
               });
             },
@@ -167,6 +136,7 @@ fs.createReadStream(path.resolve(__dirname, '', csvFile))
         },
         () => {
           if (csvTrueLinks) {
+            const uploadResults = require('./uploadResults.ts');
             uploadResults.uploadResults(csvTrueLinks);
           } else {
             console.log(

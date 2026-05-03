@@ -26,6 +26,12 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const serverCertDir = path.join(__dirname, '../../serverCertificates');
 const guiDir = path.join(__dirname, '../../gui');
 const configDir = path.join(__dirname, '../../config');
+logger.info(`GUI Directory: ${guiDir}`);
+if (fs.existsSync(guiDir)) {
+  logger.info(`GUI Files: ${fs.readdirSync(guiDir).join(', ')}`);
+} else {
+  logger.error(`GUI Directory does not exist: ${guiDir}`);
+}
 
 const serverOpts = {
   key: fs.readFileSync(path.join(serverCertDir, 'server_key.pem')),
@@ -46,11 +52,18 @@ let authorized = false;
 function appRoutes() {
   const app = express();
   app.set('trust proxy', true);
+  app.use((req, res, next) => {
+    logger.debug(`Incoming request: ${req.method} ${req.url}`);
+    next();
+  });
   app.use(bodyParser.json({
     limit: '10Mb',
     type: ['application/fhir+json', 'application/json+fhir', 'application/json']
   }));
   app.use('/crux', express.static(guiDir));
+  app.get(/^\/crux(\/.*)?$/, (req, res) => {
+    res.sendFile(path.join(guiDir, 'index.html'));
+  });
 
   const jwtValidator = function (req, res, next) {
     if (!req.path.startsWith('/ocrux')) {
@@ -95,13 +108,13 @@ function appRoutes() {
   };
 
   function certificateValidity(req, res, next) {
-    if (req.path.startsWith('/ocrux')) {
+    if (req.path.startsWith('/ocrux') || req.path.startsWith('/crux')) {
       return next();
     }
     if (authorized) {
       return next();
     }
-    const cert = req.connection.getPeerCertificate();
+    const cert = req.socket.getPeerCertificate();
     if (req.client.authorized) {
       if (!cert.subject.CN) {
         logger.error('Client has submitted a valid certificate but missing Common Name (CN)');
@@ -118,7 +131,12 @@ function appRoutes() {
   }
 
   function cleanReqPath(req, res, next) {
-    req.url = req.url.replace('ocrux/', '');
+    if (req.url.includes('ocrux/')) {
+      req.url = req.url.replace(/ocrux\//, '');
+      if (!req.url.startsWith('/')) {
+        req.url = '/' + req.url;
+      }
+    }
     return next();
   }
 

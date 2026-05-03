@@ -10,6 +10,26 @@ import matchMixin from '@domain/matching/matchMixin.ts';
 import logger from '@config/logger.ts';
 import config from '@config/index.ts';
 
+function getClientID(req) {
+  const openhimClientId = req.headers['x-openhim-clientid'];
+  if (typeof openhimClientId === 'string' && openhimClientId.trim()) {
+    return openhimClientId.trim();
+  }
+
+  const certSource = req.socket && typeof req.socket.getPeerCertificate === 'function'
+    ? req.socket
+    : req.connection;
+
+  if (!certSource || typeof certSource.getPeerCertificate !== 'function') {
+    return undefined;
+  }
+
+  const cert = certSource.getPeerCertificate();
+  return cert && cert.subject && typeof cert.subject.CN === 'string' && cert.subject.CN.trim()
+    ? cert.subject.CN.trim()
+    : undefined;
+}
+
 router.get("/ValueSet/:id/\\$expand", (req, res) => {
   fhirAxios.expand( req.params.id, req.query ).then( (resource) => {
     return res.status(200).json(resource);
@@ -229,12 +249,19 @@ router.post('/', (req, res) => {
       let patientsBundle = {
         entry: patients
       };
-      let clientID;
-      if(req.connection && typeof req.connection.getPeerCertificate === "function") {
-        const cert = req.connection.getPeerCertificate();
-        clientID = cert.subject.CN;
-      } else if(req.headers['x-openhim-clientid']) {
-        clientID = req.headers['x-openhim-clientid'];
+      const clientID = getClientID(req);
+      if (!clientID) {
+        return callback(null, {
+          code: 400,
+          responseBundle: {
+            entry: []
+          },
+          responseHeaders: {
+            patientID: [],
+            CRUID: []
+          },
+          operationSummary: []
+        });
       }
       // if (config.get('mediator:register')) {
       //   clientID = req.headers['x-openhim-clientid'];
@@ -357,13 +384,7 @@ function saveResource(req, res) {
       }]
     };
 
-    let clientID;
-    if(req.connection && typeof req.connection.getPeerCertificate === "function") {
-      const cert = req.connection.getPeerCertificate();
-      clientID = cert.subject.CN;
-    } else if(req.headers['x-openhim-clientid']) {
-      clientID = req.headers['x-openhim-clientid'];
-    }
+    const clientID = getClientID(req);
 
     if(!clientID) {
       return res.status(400).json({

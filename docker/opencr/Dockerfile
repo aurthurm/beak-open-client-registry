@@ -1,29 +1,31 @@
-# Stage 1: Build ui-react (pnpm + Vite + TanStack Start)
+# Stage 1: Build webapp (pnpm + Vite + TanStack Router SPA)
 FROM node:20-slim AS ui-builder
 
 WORKDIR /src
 
 RUN npm install -g pnpm
 
-COPY ui-react/package.json ui-react/pnpm-lock.yaml ./ui-react/
-RUN cd ui-react && pnpm install --frozen-lockfile
+COPY webapp/package.json webapp/pnpm-lock.yaml ./webapp/
+RUN cd webapp && pnpm install --frozen-lockfile
 
-COPY ui-react/ ./ui-react/
-RUN cd ui-react && pnpm build
+COPY webapp/ ./webapp/
+RUN cd webapp && pnpm build
 
-# Stage 2: Install server dependencies with bun
-FROM oven/bun:latest AS server-builder
+# Stage 2: Install server dependencies with pnpm
+FROM node:20-slim AS server-builder
 
 WORKDIR /src
 
-COPY server/package.json server/bun.lock ./server/
-RUN cd server && bun install --frozen-lockfile
+RUN npm install -g pnpm
+
+COPY server/package.json server/pnpm-lock.yaml* server/package-lock.json* ./server/
+RUN cd server && (pnpm install --no-frozen-lockfile || npm install --legacy-peer-deps)
 
 COPY server/ ./server/
 COPY resources/ ./resources/
 
 # Stage 3: Runtime
-FROM oven/bun:latest
+FROM node:20-slim
 
 WORKDIR /src/server
 
@@ -39,12 +41,15 @@ RUN wget -q https://github.com/jwilder/dockerize/releases/download/${DOCKERIZE_V
 
 COPY --from=server-builder /src/server /src/server
 COPY --from=server-builder /src/resources /src/resources
-# ui-react dist/client → server/gui, served by Express at /crux
-COPY --from=ui-builder /src/ui-react/dist/client /src/server/gui
+# webapp dist → server/gui, served by Express at /crux
+COPY --from=ui-builder /src/webapp/dist /src/server/gui
 
 ENV NODE_ENV=cicd
 ENV HAPI_FHIR_URL=http://fhir:8080/fhir/metadata
 
 EXPOSE 3000
 
-ENTRYPOINT dockerize -wait-retry-interval 5s -timeout 60s -wait $HAPI_FHIR_URL bun run src/app.ts
+# Install pnpm in runtime
+RUN npm install -g pnpm
+
+ENTRYPOINT dockerize -wait-retry-interval 5s -timeout 60s -wait $HAPI_FHIR_URL pnpm start

@@ -162,13 +162,14 @@ const loadResources = async (callback) => {
             if (err) {
               logger.error(err);
               processingError = true;
+              return nxtFile();
             }
-            if (res.statusCode && (res.statusCode < 200 || res.statusCode > 399)) {
+            if (res && res.statusCode && (res.statusCode < 200 || res.statusCode > 399)) {
               logger.error(body);
               processingError = true;
             }
-            logger.info(dest + ': ' + res.statusCode);
-            logger.info(JSON.stringify(res.body, null, 2));
+            logger.info(dest + ': ' + (res ? res.statusCode : 'unknown'));
+            logger.info(JSON.stringify(res ? res.body : {}, null, 2));
             return nxtFile();
           });
         } else {
@@ -177,13 +178,14 @@ const loadResources = async (callback) => {
             if (err) {
               logger.error(err);
               processingError = true;
+              return nxtFile();
             }
-            if (res.statusCode && (res.statusCode < 200 || res.statusCode > 399)) {
+            if (res && res.statusCode && (res.statusCode < 200 || res.statusCode > 399)) {
               logger.error(body);
               processingError = true;
             }
-            logger.info(dest + ': ' + res.statusCode);
-            logger.info(res.headers['content-location']);
+            logger.info(dest + ': ' + (res ? res.statusCode : 'unknown'));
+            logger.info(res ? res.headers['content-location'] : 'unknown');
             return nxtFile();
           });
         }
@@ -211,7 +213,8 @@ const checkInstalledPlugins = (callback) => {
     }
   };
   request.get(options, (err, res, body) => {
-    if (!body) {
+    if (err || !body) {
+      if (err) logger.error(err);
       logger.error('It seems like opensearch/elasticsearch is not running, please check to ensure it is up and running');
       return callback(true);
     }
@@ -321,9 +324,11 @@ const loadESScripts = (callback) => {
     json: jaroWinkler
   };
   request.post(options, (err, res, body) => {
-    if (err) {
+    if (err || (res && res.statusCode && (res.statusCode < 200 || res.statusCode > 399))) {
+      if (err) logger.error(err);
+      if (res && res.statusCode) logger.error(`Error loading ES scripts: ${res.statusCode}`);
       logger.error('An error has occured while adding probabilistic jaro winkler script for elasticsearch');
-      return callback(err);
+      return callback(err || new Error('Failed to load ES scripts'));
     } else {
       logger.info('Jaro winkler loaded successfully');
       return callback();

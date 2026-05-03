@@ -5,7 +5,6 @@ const requireFallback = require('./requireFallback.ts');
 const csv = requireFallback('fast-csv');
 const path = require('path');
 const async = requireFallback('async');
-const jsoncsv = requireFallback('json-csv');
 const moment = requireFallback('moment')
 process.env.NODE_ENV = process.env.NODE_ENV || 'test';
 const logger = require('../server/src/config/logger.ts').default;
@@ -24,6 +23,22 @@ const expectedToMatchButNoMatch = []
 const notExpectedToMatchButMatched = [];
 const notExpectedToMatchAndDidntMatch = []
 let trueLinks = [];
+
+const csvEscape = (value) => {
+  const text = value === null || value === undefined ? '' : String(value);
+  if (/[",\n\r]/.test(text)) {
+    return `"${text.replace(/"/g, '""')}"`;
+  }
+  return text;
+};
+
+const rowsToCsv = (rows, fields) => {
+  const lines = [fields.map((field) => csvEscape(field.label)).join(',')];
+  for (const row of rows) {
+    lines.push(fields.map((field) => csvEscape(row[field.name])).join(','));
+  }
+  return lines.join('\n');
+};
 
 const modifyCSV = () => {
   let copy = []
@@ -335,55 +350,14 @@ const uploadResults = (csvFile) => {
             }
           ];
           let date = moment().format('Y-MM-DDTHH:mm:ss')
-          jsoncsv.buffered(allLinks, {
-            fields: fields1
-          }, (err, csv) => {
-            fs.writeFile(`results/allLinks_${date}.csv`, csv, 'utf8', () => {});
-          });
-
-          jsoncsv.buffered(linkedToAllTrueOnly, {
-            fields: fields1
-          }, (err, csv) => {
-            fs.writeFile(`results/Linked_to_all_true_matches_only_${date}.csv`, csv, 'utf8', () => {});
-          });
-
-          jsoncsv.buffered(linkedToAllTrueAndOthers, {
-            fields: fields1,
-          }, (err, csv) => {
-            fs.writeFile(`results/Linked_to_all_the_true_matches_and_other_unexpected_matches_${date}.csv`, csv, 'utf8', () => {});
-          });
-
-          jsoncsv.buffered(linkedToSomeTrue, {
-            fields: fields1,
-          }, (err, csv) => {
-            fs.writeFile(`results/Linked_to_atleast_one_true_matches_but_not_all_${date}.csv`, csv, 'utf8', () => {});
-          });
-
-          jsoncsv.buffered(
-            hasMatchesButNoTrue, {
-              fields: fields1,
-            }, (err, csv) => {
-              fs.writeFile(`results/Linked_to_some_matches_but_excluding_the_true_match_${date}.csv`, csv, 'utf8', () => {});
-            }
-          );
-
-          jsoncsv.buffered(notExpectedToMatchButMatched, {
-            fields: fields1,
-          }, (err, csv) => {
-            fs.writeFile(`results/Didnt_expect_to_have_matches_but_match_found_${date}.csv`, csv, 'utf8', () => {});
-          });
-
-          jsoncsv.buffered(expectedToMatchButNoMatch, {
-            fields: fields1,
-          }, (err, csv) => {
-            fs.writeFile(`results/Expected_to_have_matches_but_matched_nothing_${date}.csv`, csv, 'utf8', () => {});
-          });
-
-          jsoncsv.buffered(noMatches, {
-            fields: fields1,
-          }, (err, csv) => {
-            fs.writeFile(`results/All_no_matches_${date}.csv`, csv, 'utf8', () => {});
-          });
+          fs.writeFile(`results/allLinks_${date}.csv`, rowsToCsv(allLinks, fields1), 'utf8', () => {});
+          fs.writeFile(`results/Linked_to_all_true_matches_only_${date}.csv`, rowsToCsv(linkedToAllTrueOnly, fields1), 'utf8', () => {});
+          fs.writeFile(`results/Linked_to_all_the_true_matches_and_other_unexpected_matches_${date}.csv`, rowsToCsv(linkedToAllTrueAndOthers, fields1), 'utf8', () => {});
+          fs.writeFile(`results/Linked_to_atleast_one_true_matches_but_not_all_${date}.csv`, rowsToCsv(linkedToSomeTrue, fields1), 'utf8', () => {});
+          fs.writeFile(`results/Linked_to_some_matches_but_excluding_the_true_match_${date}.csv`, rowsToCsv(hasMatchesButNoTrue, fields1), 'utf8', () => {});
+          fs.writeFile(`results/Didnt_expect_to_have_matches_but_match_found_${date}.csv`, rowsToCsv(notExpectedToMatchButMatched, fields1), 'utf8', () => {});
+          fs.writeFile(`results/Expected_to_have_matches_but_matched_nothing_${date}.csv`, rowsToCsv(expectedToMatchButNoMatch, fields1), 'utf8', () => {});
+          fs.writeFile(`results/All_no_matches_${date}.csv`, rowsToCsv(noMatches, fields1), 'utf8', () => {});
 
           let TP = linkedToAllTrueOnly.length
           let FP = linkedToAllTrueAndOthers.length + notExpectedToMatchButMatched.length + hasMatchesButNoTrue.length

@@ -1,0 +1,15 @@
+{
+    "keep": {
+        "days": true,
+        "amount": 14
+    },
+    "auditLog": "/home/administrator/Documents/Development/registries/client-registry/server/logs/.e10597aef9773862ac046349fb78c33e5fae19f5-audit.json",
+    "files": [
+        {
+            "date": 1777743667642,
+            "name": "/home/administrator/Documents/Development/registries/client-registry/server/logs/openclientregistry-2026-05-02-19.log",
+            "hash": "fe58f0df54fcd36181b0a34c2ee226db5d5a2329d4dbc3de3ae6b4f5c450d554"
+        }
+    ],
+    "hashType": "sha256"
+}

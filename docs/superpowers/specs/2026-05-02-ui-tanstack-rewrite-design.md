@@ -203,13 +203,13 @@ The language switcher in the Navbar is rendered but toggles only between `en` (a
 cd server && bun run dev       # Express on :3000
 
 # Terminal 2  
-cd ui-react && pnpm dev        # TanStack Start on :3001
+cd old-webapp && pnpm dev        # TanStack Start on :3001
                                # /ocrux/* proxied to :3000
 ```
 
 ### Production
 ```bash
-cd ui-react && pnpm build      # outputs to server/gui/
+cd old-webapp && pnpm build      # outputs to server/gui/
 cd server && bun run start     # serves /crux from server/gui/
 ```
 
@@ -233,8 +233,8 @@ date-fns
 
 ### Root package.json scripts added
 ```json
-"ui:dev":   "cd ui-react && pnpm dev",
-"ui:build": "cd ui-react && pnpm build"
+"old-ui:dev":   "cd old-webapp && pnpm dev",
+"old-ui:build": "cd old-webapp && pnpm build"
 ```
 
 ### Unchanged

@@ -2,7 +2,7 @@
 jest.mock('request');
 jest.mock('axios');
 const URI = require('urijs');
-const config = require('../lib/config');
+const config = require('../src/config/index.ts').default;
 const FHIR_BASE_URL = URI(config.get('fhirServer:baseURL')).toString();
 const ES_BASE_URL = URI(config.get('elastic:server')).segment(config.get('elastic:index')).toString();
 
@@ -10,7 +10,7 @@ const PATIENT3 = require("./FHIRResources/patient3.json");
 
 const supertest = require("supertest");
 
-const route = require("../lib/routes/fhir");
+const route = require("../src/http/routes/fhir.ts").default;
 
 const express = require('express');
 const app = express();
@@ -90,6 +90,14 @@ describe( "Testing express", () => {
         expect(response.headers.location).toEqual("Patient/433ebeb6-1d89-4b64-97e6-a985675ca571");
         // verify golden record ID
         expect(response.headers.locationcruid).toEqual("Patient/eda0fdeb-1d52-4878-a84f-ccf581ef9fff");
+    } );
+  } );
+
+  test( "Testing Patient Submission without client id returns 400", () => {
+    return supertest(app)
+    .post("/Patient").send(PATIENT3).then( (response) => {
+      expect(response.status).toEqual(400);
+      expect(response.body.issue[0].diagnostics).toEqual("Client ID not found");
     } );
   } );
 
