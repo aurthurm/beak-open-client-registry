@@ -14,6 +14,100 @@ const Fhir = fhirPkg.Fhir;
 
 const convert = new Fhir();
 
+const readFHIRResource = (filePath) => {
+  const data = fs.readFileSync(filePath);
+  if (filePath.substring(filePath.length - 3) === 'xml') {
+    return convert.xmlToObj(data);
+  }
+  return JSON.parse(data);
+};
+
+const saveFHIRResource = (fhir, callback) => {
+  const dest = URI(config.get('fhirServer:baseURL')).segment(fhir.resourceType).segment(fhir.id).toString();
+  const options = {
+    url: dest,
+    withCredentials: true,
+    auth: {
+      username: config.get('fhirServer:username'),
+      password: config.get('fhirServer:password')
+    },
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    json: fhir,
+  };
+
+  if (fhir.resourceType === 'Bundle' &&
+    (fhir.type === 'transaction' || fhir.type === 'batch')) {
+    logger.info('Saving ' + fhir.type);
+    return request.post(options, (err, res, body) => {
+      if (err) {
+        logger.error(err);
+        return callback(err);
+      }
+      if (res && res.statusCode && (res.statusCode < 200 || res.statusCode > 399)) {
+        logger.error(body);
+        return callback(new Error(`Failed to save ${fhir.type}: ${res.statusCode}`));
+      }
+      logger.info(dest + ': ' + (res ? res.statusCode : 'unknown'));
+      logger.info(JSON.stringify(res ? res.body : {}, null, 2));
+      return callback();
+    });
+  }
+
+  logger.info('Saving ' + fhir.resourceType + ' - ' + fhir.id);
+  return request.put(options, (err, res, body) => {
+    if (err) {
+      logger.error(err);
+      return callback(err);
+    }
+    if (res && res.statusCode && (res.statusCode < 200 || res.statusCode > 399)) {
+      logger.error(body);
+      return callback(new Error(`Failed to save ${fhir.resourceType}/${fhir.id}: ${res.statusCode}`));
+    }
+    logger.info(dest + ': ' + (res ? res.statusCode : 'unknown'));
+    logger.info(res ? res.headers['content-location'] : 'unknown');
+    return callback();
+  });
+};
+
+const ensureRequiredResources = (callback) => {
+  const requiredFiles = [
+    `${__dirname}/../../../../resources/SearchParameter/person-username.SearchParameter.json`,
+    `${__dirname}/../../../../resources/Relationships/PatientRelationship.json`,
+    `${__dirname}/../../../../resources/ResourcesData/admin.OCRUser.json`,
+  ];
+  let processingError = false;
+
+  async.eachSeries(requiredFiles, (filePath, nxtFile) => {
+    const fhir = readFHIRResource(filePath);
+    const dest = URI(config.get('fhirServer:baseURL')).segment(fhir.resourceType).segment(fhir.id).toString();
+    const options = {
+      url: dest,
+      withCredentials: true,
+      auth: {
+        username: config.get('fhirServer:username'),
+        password: config.get('fhirServer:password')
+      },
+      headers: {
+        'Cache-Control': 'no-cache',
+      }
+    };
+    request.get(options, (err, res, body) => {
+      if (!err && res && res.statusCode >= 200 && res.statusCode < 300) {
+        return nxtFile();
+      }
+      logger.warn(`Required FHIR resource ${fhir.resourceType}/${fhir.id} is missing or unreadable; loading it`);
+      saveFHIRResource(fhir, (saveErr) => {
+        if (saveErr) {
+          processingError = true;
+        }
+        return nxtFile();
+      });
+    });
+  }, () => callback(processingError));
+};
+
 const modifyRelationship = () => {
   return new Promise((resolve, reject) => {
     if(!config.get("structureDefinition:autoModifyRelationshipBasedOnDecisionRules")) {
@@ -108,7 +202,7 @@ const loadResources = async (callback) => {
   await modifyRelationship();
   const installed = config.get('app:installed');
   if (installed) {
-    return callback(false);
+    return ensureRequiredResources(callback);
   }
   let processingError = false;
   const folders = [
@@ -136,59 +230,13 @@ const loadResources = async (callback) => {
       logger.info('Loading ' + file.name + ' into FHIR server...');
       fs.readFile(`${file.folder}/${file.name}`, (err, data) => {
         if (err) throw err;
-        let fhir;
-        if (file.name.substring(file.name.length - 3) === 'xml') {
-          fhir = convert.xmlToObj(data);
-        } else {
-          fhir = JSON.parse(data);
-        }
-        const dest = URI(config.get('fhirServer:baseURL')).segment(fhir.resourceType).segment(fhir.id).toString();
-        const options = {
-          url: dest,
-          withCredentials: true,
-          auth: {
-            username: config.get('fhirServer:username'),
-            password: config.get('fhirServer:password')
-          },
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          json: fhir,
-        };
-        if (fhir.resourceType === 'Bundle' &&
-          (fhir.type === 'transaction' || fhir.type === 'batch')) {
-          logger.info('Saving ' + fhir.type);
-          request.post(options, (err, res, body) => {
-            if (err) {
-              logger.error(err);
-              processingError = true;
-              return nxtFile();
-            }
-            if (res && res.statusCode && (res.statusCode < 200 || res.statusCode > 399)) {
-              logger.error(body);
-              processingError = true;
-            }
-            logger.info(dest + ': ' + (res ? res.statusCode : 'unknown'));
-            logger.info(JSON.stringify(res ? res.body : {}, null, 2));
-            return nxtFile();
-          });
-        } else {
-          logger.info('Saving ' + fhir.resourceType + ' - ' + fhir.id);
-          request.put(options, (err, res, body) => {
-            if (err) {
-              logger.error(err);
-              processingError = true;
-              return nxtFile();
-            }
-            if (res && res.statusCode && (res.statusCode < 200 || res.statusCode > 399)) {
-              logger.error(body);
-              processingError = true;
-            }
-            logger.info(dest + ': ' + (res ? res.statusCode : 'unknown'));
-            logger.info(res ? res.headers['content-location'] : 'unknown');
-            return nxtFile();
-          });
-        }
+        const fhir = file.name.substring(file.name.length - 3) === 'xml' ? convert.xmlToObj(data) : JSON.parse(data);
+        saveFHIRResource(fhir, (saveErr) => {
+          if (saveErr) {
+            processingError = true;
+          }
+          return nxtFile();
+        });
       });
     }, () => {
       logger.info('Done loading required resources');
@@ -364,6 +412,10 @@ const init = (callback) => {
       });
     }
   }, () => {
+    if (errFound) {
+      logger.error('Default data loading finished with errors; app.installed will remain false');
+      return callback(errFound);
+    }
     mixin.updateConfigFile(['app', 'installed'], true, () => {
       logger.info('Done loading Default data');
       return callback(errFound);

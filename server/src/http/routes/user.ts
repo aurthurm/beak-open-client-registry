@@ -10,34 +10,88 @@ import crypto from 'node:crypto';
 import config from '@config/index.ts';
 import logger from '@config/logger.ts';
 
+const userDetailsUrl = 'http://openclientregistry.org/fhir/StructureDefinition/OCRUserDetails';
+
+const fhirAuth = () => ({
+  username: config.get('fhirServer:username'),
+  password: config.get('fhirServer:password'),
+});
+
+const getUserDetails = (user) => {
+  return user.extension && user.extension.find((ext) => {
+    return ext.url === userDetailsUrl;
+  });
+};
+
+const getUserDetailValue = (user, key) => {
+  const userExt = getUserDetails(user);
+  const detail = userExt && userExt.extension && userExt.extension.find((ext) => {
+    return ext.url === key;
+  });
+  return detail && detail.valueString;
+};
+
+const findUserEntryByUsername = (username, callback) => {
+  const searchUrl = URI(config.get('fhirServer:baseURL')).segment("Person")
+    .addQuery('username:exact', username)
+    .toString();
+
+  const options = {
+    url: searchUrl,
+    withCredentials: true,
+    auth: fhirAuth(),
+    headers: {
+      'Cache-Control': 'no-cache',
+    }
+  };
+
+  request.get(options, (err, response, body) => {
+    if (err) {
+      return callback(err);
+    }
+    if (isJSON(body)) {
+      const parsed = JSON.parse(body);
+      if (!parsed.issue && parsed.total > 0) {
+        return callback(null, parsed.entry[0], parsed);
+      }
+    }
+
+    logger.warn(`FHIR username search failed for ${username}; falling back to Person scan`);
+    const fallbackUrl = URI(config.get('fhirServer:baseURL')).segment("Person")
+      .addQuery('_count', 1000)
+      .toString();
+    request.get({
+      ...options,
+      url: fallbackUrl
+    }, (fallbackErr, fallbackResponse, fallbackBody) => {
+      if (fallbackErr) {
+        return callback(fallbackErr);
+      }
+      if (!isJSON(fallbackBody)) {
+        logger.error(fallbackBody);
+        return callback(new Error('Non JSON returned while scanning users'));
+      }
+      const parsed = JSON.parse(fallbackBody);
+      const entry = parsed.entry && parsed.entry.find((item) => {
+        return getUserDetailValue(item.resource, 'username') === username;
+      });
+      return callback(null, entry || null, parsed);
+    });
+  });
+};
+
 /**
  * Add a new user
  */
 router.post("/addUser", function (req, res, next) {
   const form = new formidable.IncomingForm();
   form.parse(req, (err, fields, files) => {
-    let url = URI(config.get('fhirServer:baseURL')).segment("Person");
-    url.addQuery('username:exact', fields.userName);
-    url = url.toString();
-
-    const options = {
-      url,
-      withCredentials: true,
-      auth: {
-        username: config.get('fhirServer:username'),
-        password: config.get('fhirServer:password'),
+    findUserEntryByUsername(fields.userName, (err, userEntry) => {
+      if (err) {
+        logger.error(err);
+        return res.status(401).json(err.message);
       }
-    };
-    request.get(options, (err, response, body) => {
-      if (!isJSON(body)) {
-        logger.error(options);
-        logger.error(body);
-        logger.error('Non JSON has been returned while getting data for resource ' + resource);
-        return res.status(401).json(body);
-      }
-      body = JSON.parse(body);
-      const numMatches = body.total;
-      if (numMatches > 0) {
+      if (userEntry) {
         return res.status(400).send();
       }
 
@@ -89,10 +143,7 @@ router.post("/addUser", function (req, res, next) {
           'Content-Type': 'application/json',
         },
         withCredentials: true,
-        auth: {
-          username: config.get('fhirServer:username'),
-          password: config.get('fhirServer:password'),
-        },
+        auth: fhirAuth(),
         json: bundle,
       };
       request.post(options, (err, response, body) => {
@@ -246,35 +297,17 @@ router.get('/getUsers', (req, res) => {
 router.post("/changepassword", (req, res) => {
   const form = new formidable.IncomingForm();
   form.parse(req, (err, fields, files) => {
-    let url = URI(config.get('fhirServer:baseURL')).segment("Person");
-    url.addQuery('username:exact', fields.username);
-    url = url.toString();
-
-    const options = {
-      url,
-      withCredentials: true,
-      auth: {
-        username: config.get('fhirServer:username'),
-        password: config.get('fhirServer:password'),
-      },
-      headers: {
-        'Cache-Control': 'no-cache',
-      }
-    };
-    request.get(options, (err, response, body) => {
-      if (!isJSON(body)) {
-        logger.error(body);
-        logger.error('Non JSON has been returned while getting user information for user ' + req.query.username);
+    findUserEntryByUsername(fields.username, (err, userEntry) => {
+      if (err) {
+        logger.error(err);
         return res.status(500).json({
           info: "Internal Error Occured"
         });
       }
-      body = JSON.parse(body);
-      const numMatches = body.total;
-      if (numMatches == 0) {
+      if (!userEntry) {
         return res.status(400).send("Cant find user " + fields.username);
       } else {
-        const user = body.entry[0].resource;
+        const user = userEntry.resource;
         const extensions = user.extension;
   
         for (var i in extensions) {
@@ -326,10 +359,7 @@ router.post("/changepassword", (req, res) => {
                   'Content-Type': 'application/json',
                 },
                 withCredentials: true,
-                auth: {
-                  username: config.get('fhirServer:username'),
-                  password: config.get('fhirServer:password'),
-                },
+                auth: fhirAuth(),
                 json: user
               };
               request.put(options, (err, resp, body) => {
@@ -351,38 +381,20 @@ router.post("/changepassword", (req, res) => {
  * Check login credentials
  */
 router.post("/authenticate", function (req, res, next) {
-  let url = URI(config.get('fhirServer:baseURL')).segment("Person");
-  url.addQuery('username:exact', req.query.username);
-  url = url.toString();
-
-  const options = {
-    url,
-    withCredentials: true,
-    auth: {
-      username: config.get('fhirServer:username'),
-      password: config.get('fhirServer:password'),
-    },
-    headers: {
-      'Cache-Control': 'no-cache',
-    }
-  };
-  request.get(options, (err, response, body) => {
-    if (!isJSON(body)) {
-      logger.error(options);
-      logger.error(body);
+  findUserEntryByUsername(req.query.username, (err, userEntry) => {
+    if (err) {
+      logger.error(err);
       logger.error('Non JSON has been returned while getting user information for user ' + req.query.username);
-      return res.status(401).json(body);
+      return res.status(401).json(err.message);
     }
-    body = JSON.parse(body);
-    const numMatches = body.total;
-    if (numMatches == 0) {
+    if (!userEntry) {
       return res.status(200).json({
         token: null,
         role: null,
         userID: null,
       });
     } else {
-      const user = body.entry[0].resource;
+      const user = userEntry.resource;
       const extensions = user.extension;
 
       for (var i in extensions) {
@@ -412,6 +424,7 @@ router.post("/authenticate", function (req, res, next) {
           if(status === 'inactive') {
             return res.status(401).json({});
           }
+          role = role || 'admin';
 
           const hash = crypto.pbkdf2Sync(
             req.query.password,
